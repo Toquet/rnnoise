@@ -4,14 +4,11 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -96,7 +93,8 @@ void celt_fir(
          int ord)
 {
    int i,j;
-   opus_val16 rnum[ord];
+   //opus_val16 rnum[ord];
+   opus_val16 *rnum = (opus_val16*)malloc( sizeof(opus_val16) * ord);	// MSVC doesn't support VLA
    for(i=0;i<ord;i++)
       rnum[i] = num[ord-i-1];
    for (i=0;i<N-3;i+=4)
@@ -119,6 +117,8 @@ void celt_fir(
          sum = MAC16_16(sum,rnum[j],x[i+j-ord]);
       y[i] = ROUND16(sum, SIG_SHIFT);
    }
+
+   free(rnum);// VLA
 }
 
 void celt_iir(const opus_val32 *_x,
@@ -147,8 +147,11 @@ void celt_iir(const opus_val32 *_x,
 #else
    int i,j;
    celt_assert((ord&3)==0);
-   opus_val16 rden[ord];
-   opus_val16 y[N+ord];
+   //opus_val16 rden[ord];
+   //opus_val16 y[N+ord];
+   opus_val16 *rden = (opus_val16*)malloc(ord * sizeof(opus_val16));
+   opus_val16 *y = (opus_val16*)malloc( (N + ord) * sizeof(opus_val16));
+
    for(i=0;i<ord;i++)
       rden[i] = den[ord-i-1];
    for(i=0;i<ord;i++)
@@ -192,6 +195,9 @@ void celt_iir(const opus_val32 *_x,
    }
    for(i=0;i<ord;i++)
       mem[i] = _y[N-i-1];
+
+   free(rden);	//
+   free(y);
 #endif
 }
 
@@ -208,7 +214,8 @@ int _celt_autocorr(
    int fastN=n-lag;
    int shift;
    const opus_val16 *xptr;
-   opus_val16 xx[n];
+   //opus_val16 xx[n];					// VAL
+   opus_val16 *xx = (opus_val16*)malloc(sizeof(opus_val16) * n );
    celt_assert(n>0);
    celt_assert(overlap>=0);
    if (overlap == 0)
@@ -275,5 +282,6 @@ int _celt_autocorr(
    }
 #endif
 
+   free(xx);
    return shift;
 }

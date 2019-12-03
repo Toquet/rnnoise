@@ -10,14 +10,11 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -40,6 +37,7 @@
 //#include "modes.h"
 //#include "stack_alloc.h"
 //#include "mathops.h"
+
 #include "celt_lpc.h"
 #include "math.h"
 
@@ -297,9 +295,13 @@ void pitch_search(const opus_val16 *x_lp, opus_val16 *y,
    celt_assert(max_pitch>0);
    lag = len+max_pitch;
 
-   opus_val16 x_lp4[len>>2];
-   opus_val16 y_lp4[lag>>2];
-   opus_val32 xcorr[max_pitch>>1];
+   opus_val16 *x_lp4 = (opus_val16 *)malloc( (len >> 2) * sizeof(opus_val16) ) ;	
+   opus_val16 *y_lp4 = (opus_val16 *)malloc( (lag >> 2) * sizeof(opus_val16) ) ;
+   opus_val32 *xcorr = (opus_val32 *)malloc((max_pitch>>1) * sizeof(opus_val32) );
+
+   //opus_val16 x_lp4[len>>2];
+   //opus_val16 y_lp4[lag>>2];
+   //opus_val32 xcorr[max_pitch>>1];
 
    /* Downsample by 2 again */
    for (j=0;j<len>>2;j++)
@@ -382,6 +384,11 @@ void pitch_search(const opus_val16 *x_lp, opus_val16 *y,
       offset = 0;
    }
    *pitch = 2*best_pitch[0]-offset;
+
+
+   free(x_lp4);			// �ͷ�
+   free(y_lp4);
+   free(xcorr);
 }
 
 #ifdef FIXED_POINT
@@ -443,7 +450,9 @@ opus_val16 remove_doubling(opus_val16 *x, int maxperiod, int minperiod,
       *T0_=maxperiod-1;
 
    T = T0 = *T0_;
-   opus_val32 yy_lookup[maxperiod+1];
+   //opus_val32 yy_lookup[maxperiod+1];
+   opus_val32 *yy_lookup = (opus_val32*)malloc(sizeof(opus_val32) * (maxperiod+1) );
+
    dual_inner_prod(x, x, x-T0, N, &xx, &xy);
    yy_lookup[0] = xx;
    yy=xx;
@@ -522,5 +531,8 @@ opus_val16 remove_doubling(opus_val16 *x, int maxperiod, int minperiod,
 
    if (*T0_<minperiod0)
       *T0_=minperiod0;
+
+
+   free(yy_lookup);			// free
    return pg;
 }
