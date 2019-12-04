@@ -6,6 +6,10 @@ project(RnnNoise
     DESCRIPTION "Noise suppression algorithm developed by Mozilla."
     LANGUAGES C CXX)
 
+option(BUILD_EXAMPLES "Compiles the examples." OFF)
 
 add_subdirectory(src)
-add_subdirectory(examples)
+
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()

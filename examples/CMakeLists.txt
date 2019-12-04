@@ -1,4 +1,4 @@
 add_executable(rnnoise_demo rnnoise_demo.cpp)
 target_compile_features(rnnoise_demo PRIVATE cxx_std_17)
 
-target_link_libraries(rnnoise_demo PRIVATE rnnoise_library)
+target_link_libraries(rnnoise_demo PRIVATE rnnoise_target)
