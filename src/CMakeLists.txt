@@ -3,7 +3,7 @@
 file(GLOB SRC_LIST CONFIGURE_DEPENDS "*.c")
 
 # Make an automatic library - will be static or dynamic based on user setting
-add_library(rnnoise_library ${SRC_LIST})
+add_library(rnnoise_library SHARED ${SRC_LIST})
 
 # We need this directory, and users of our library will need it too
 target_include_directories(rnnoise_library PUBLIC ../include PRIVATE ../include/rnnoise)
